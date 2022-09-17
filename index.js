@@ -2,9 +2,9 @@ const axios = require('axios');
 // 重试次数
 axios.defaults.retry = 2;
 // 请求的间隙
-axios.defaults.retryDelay = 5000;
+axios.defaults.retryDelay = 1000;
 //请求超时时间
-axios.defaults.timeout = 30000;
+axios.defaults.timeout = 10000;
 
 let ok = 0;
 let err = 0;
@@ -14,23 +14,21 @@ async function main() {
   const uid = process.argv[2];
 	console.log('开始获取openid');
 	const openid = await getOpenId(uid);
-	if(openid == undefined) {
+	while(openid == undefined) {
 		console.log('获取openid失败');
 		const openid = await getOpenId(uid);
-	}else{
-		console.log('已成功获取openid');
-		console.log('开始获取token');
-		const token = await getToken(openid);
-		if(token == undefined) {
-			console.log('获取token失败');
-			const token = await getToken(openid);
-		}else{
-			console.log('已成功获取token');
-			setInterval(() => {
-				sheep_win(token)
-			}, 1500)
-		}
 	}
+	console.log('已成功获取openid');
+	console.log('开始获取token');
+	const token = await getToken(openid);
+	while(token == undefined) {
+		console.log('获取token失败');
+		const token = await getToken(openid);
+	}
+	console.log('已成功获取token');
+	setInterval(() => {
+		sheep_win(token)
+	}, 1500)
 }
 
 // uid: 45942602
